@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio 1</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f8f8f8; padding: 40px; }
+        h1 { text-align: center; }
+        h2 { text-align: center; }
+        .formulario { max-width: 600px; margin: 20px auto; }
+        textarea { width: 100%; height: 150px; padding: 10px; font-size: 14px; }
+        button { display: block; margin: 20px auto; padding: 10px 20px; font-size: 16px; }
+
+        table {
+            width: 80%;
+            margin: 0 auto;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #0078d7;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f0f8ff;
+        }
+
+        tr:hover {
+            background-color: #e3f2fd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Coloque os dados dos vendedores aqui:</h1>
+    <br/>
+    <div class="formulario">
+        <textarea id="dados_texto" rows="15" cols="100"></textarea>
+        <br/>
+        <br/>
+        <br/>
+        <button type="button" id="ler_json">Calcular comissão</button>
+    </div>
+    <div id="resultado"></div>
+
+    <script>
+        document.getElementById('ler_json').addEventListener('click', function(event) {
+            const dados_texto = document.getElementById('dados_texto');
+            const resultadoElement = document.getElementById('resultado');
+
+            var json_vendedores = JSON.parse(dados_texto.value.replace(/&quot;/gi, '"'));
+
+            var dados_vendedores = [];
+
+            var comissao = 0;
+
+            if(json_vendedores.vendas[0].valor >= 100 && json_vendedores.vendas[0].valor < 500){
+                comissao = json_vendedores.vendas[0].valor * (1 / 100);
+            }else if(json_vendedores.vendas[0].valor >= 500){
+                comissao = json_vendedores.vendas[0].valor * (5 / 100);
+            }
+
+            dados_vendedores.push({"vendedor": json_vendedores.vendas[0].vendedor, "vendas": [{"valor": json_vendedores.vendas[0].valor, "comissao": comissao}]});
+
+            for (let i = 1; i < json_vendedores.vendas.length; i++) {
+                var venda = json_vendedores.vendas[i];
+                var inseriu = false;
+                comissao = 0;
+
+                if(venda.valor >= 100 && venda.valor < 500){
+                    comissao = venda.valor * (1 / 100);
+                }else if(venda.valor >= 500){
+                    comissao = venda.valor * (5 / 100);
+                }
+                
+                for (let e = 0; e < dados_vendedores.length; e++) {
+                    if (dados_vendedores[e].vendedor == venda.vendedor) {
+                        dados_vendedores[e].vendas.push({"valor": venda.valor, "comissao": comissao});
+                        inseriu = true;
+                        break;
+                    }
+                }
+
+                if (inseriu == false) {
+                    dados_vendedores.push({"vendedor": venda.vendedor, "vendas": [{"valor": venda.valor, "comissao": comissao}]});
+                }
+            }
+
+            var html = ``;
+
+            for (let h = 0; h < dados_vendedores.length; h++) {
+                var html2 = ``;
+                var comissao_total = 0;
+                for (let j = 0; j < dados_vendedores[h].vendas.length; j++) {
+                    comissao_total += dados_vendedores[h].vendas[j].valor;
+                    var comissao_porcentagem = '';
+                    if(dados_vendedores[h].vendas[j].valor < 100){
+                        comissao_porcentagem = 'Sem Comissão';
+                    }else if(dados_vendedores[h].vendas[j].valor < 500){
+                        comissao_porcentagem = '1% de Comissão';
+                    }else if(dados_vendedores[h].vendas[j].valor >= 500){
+                        comissao_porcentagem = '5% de Comissão';
+                    }
+                    html2 += `
+                        <tr>
+                            <td>R$ `+dados_vendedores[h].vendas[j].valor+`</td>
+                            <td>`+comissao_porcentagem+`</td>
+                            <td>R$ `+dados_vendedores[h].vendas[j].comissao.toFixed(2)+`</td>
+                        </tr>
+                    `;
+                }
+                html = `
+                    <br/>
+                    <br/>
+                    <br/>
+                    <h2>`+dados_vendedores[h].vendedor+` - Comissão Total: R$ `+comissao_total.toFixed(2)+`</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Valor da Venda</th>
+                                <th>Porcentagem da Comissão</th>
+                                <th>Valor da Comissão</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            `+html2+`
+                        </tbody>
+                    </table>
+                            
+                `;
+                resultadoElement.insertAdjacentHTML("beforeend", html);
+            }
+        });
+    </script>
+    
+</body>
+</html>
