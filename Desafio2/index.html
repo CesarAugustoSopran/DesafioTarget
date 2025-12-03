@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio 1</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        #container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            margin: 0 0 10px;
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        .card p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .buttons button {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .buttons button:first-child {
+            margin-right: 10px;
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .buttons button:first-child:hover {
+            background-color: #45a049;
+        }
+
+        .buttons button:last-child {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .buttons button:last-child:hover {
+            background-color: #e53935;
+        }
+
+        /* Fundo escuro da janela */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Conteúdo da janela */
+        .janela {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .janela input {
+            width: 90%;
+            padding: 8px;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .janela button {
+            margin: 5px;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-ok {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-cancelar {
+            background-color: #f44336;
+            color: white;
+        }
+
+        #abrirJanela {
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Estoque de Produtos</h1>
+    <br/>
+    <div id="container"></div>
+    <div class="overlay" id="overlay">
+        <div class="janela">
+            <h3 id="tituloJanela"></h3>
+            <input type="number" id="campoTexto" placeholder="Escreva aqui...">
+            <div>
+            <button class="btn-ok" id="botaoOk">OK</button>
+            <button class="btn-cancelar" id="botaoCancelar">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const estoque = [
+            {
+                "codigoProduto": 101,
+                "descricaoProduto": "Caneta Azul",
+                "estoque": 150
+
+            },
+            {
+                "codigoProduto": 102,
+                "descricaoProduto": "Caderno Universitário",
+                "estoque": 75
+            },
+            {
+                "codigoProduto": 103,
+                "descricaoProduto": "Borracha Branca",
+                "estoque": 200
+            },
+            {
+                "codigoProduto": 104,
+                "descricaoProduto": "Lápis Preto HB",
+                "estoque": 320
+            },
+            {
+                "codigoProduto": 105,
+                "descricaoProduto": "Marcador de Texto Amarelo",
+                "estoque": 90
+            }
+        ];
+
+        const movimentacoes = [];
+
+        listar();
+
+        function listar() {
+            document.getElementById('container').innerHTML = '';
+            var html = ``;
+            for (let i = 0; i < estoque.length; i++) {
+                var produto = estoque[i];
+
+                html += `
+                    <div class="card">
+                        <h2>`+produto.descricaoProduto+`</h2>
+                        <p>Estoque: `+produto.estoque+` unidades</p>
+                        <div class="buttons">
+                            <button type="button" class="movimentacao" onClick="abrirJanela('entrada', `+produto.codigoProduto+`)">Entrada</button>
+                            <button type="button" class="movimentacao" onClick="abrirJanela('saida', `+produto.codigoProduto+`)">Saída</button>
+                        </div>
+                    </div>
+                `;
+            }
+            document.getElementById('container').insertAdjacentHTML("beforeend", html);
+        }
+
+        function abrirJanela(tipo, codigo) {
+            const overlay = document.getElementById('overlay');
+            const botaoOk = document.getElementById('botaoOk');
+            const botaoCancelar = document.getElementById('botaoCancelar');
+            const campoTexto = document.getElementById('campoTexto');
+            const tituloJanela = document.getElementById('tituloJanela');
+
+            if (tipo == 'entrada') {
+                tituloJanela.textContent = "Digite a quantidade que entrou:";
+            }else{
+                tituloJanela.textContent = "Digite a quantidade que saiu:";
+            }
+
+            overlay.style.display = 'flex';
+            campoTexto.focus();
+
+            botaoCancelar.onclick = () => {
+                overlay.style.display = 'none';
+                campoTexto.value = '';
+            };
+
+            botaoOk.onclick = () => {
+                var movimentacao = movimentar(tipo, codigo, campoTexto.value);
+                if (movimentacao.code == 0) {
+                    alert('Quantidade final do produto: '+movimentacao.qtde_final+' unidades');
+                    overlay.style.display = 'none';
+                    campoTexto.value = '';
+                    listar();
+                }else{
+                    alert(movimentacao.msg);
+                }
+            };
+        }
+
+        function movimentar(tipo, codigo, qtde){
+            var code = 1;
+            var msg = 'Não foi possivel fazer a movimentação. Tente novamente.';
+            var dados = {"id_movimentacao" : ('00000000' + (Math.floor(Math.random() * (10000000 - 1)) + 1)).slice(-8), "descricao": (tipo == 'entrada' ? 'Entrada' : 'Saida'), "qtde": qtde};
+            var qtde_final = 0;
+
+            for (let i = 0; i < estoque.length; i++) {
+                if (estoque[i].codigoProduto == codigo) {
+                    if(tipo == 'saida'){
+                        if (estoque[i].estoque >= qtde) {
+                            movimentacoes.push(dados);
+                            estoque[i].estoque = parseInt(estoque[i].estoque) - parseInt(qtde);
+                            qtde_final = estoque[i].estoque;
+                            code = 0;
+                            msg = '';
+                            break;
+                        }else{
+                            msg = 'Quantidade exedente a do estoque. Tente novamente.';
+                            break;
+                        }
+                    }else if(tipo == 'entrada'){
+                        movimentacoes.push(dados);
+                        estoque[i].estoque = parseInt(estoque[i].estoque) + parseInt(qtde);
+                        qtde_final = estoque[i].estoque;
+                        code = 0;
+                        msg = '';
+                        break;
+                    }else{
+                        msg = 'Tipo de movimentação desconhecida. Tente novamente.';
+                        break;
+                    }
+                }else{
+                    msg = 'Produto não encontrado. Tente novamente.';
+                }
+            }
+
+            if (code == 0) {
+                return {"code": code, "qtde_final": qtde_final};
+            }else{
+                return {"code": code, "msg": msg};
+            }
+        };
+    </script>
+    
+</body>
+</html>
