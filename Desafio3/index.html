@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio 1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        body {
+            background: #fafafa;
+            color: #333;
+            padding: 40px;
+        }
+
+        .form-section {
+            max-width: 600px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 30px 40px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #0077cc;
+            padding-bottom: 8px;
+        }
+
+        .fields {
+            display: flex;
+            gap: 20px;
+        }
+
+        .field-group {
+            width: 50%;
+        }
+
+        .field-group label {
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .field-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            transition: border-color 0.3s ease;
+        }
+
+        .field-group input:focus {
+            border-color: #0077cc;
+            outline: none;
+        }
+
+        #btn-calc { display: block; margin: 20px auto; padding: 10px 20px; font-size: 16px; }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .janela {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .janela input {
+            width: 90%;
+            padding: 8px;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .janela button {
+            margin: 5px;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-ok {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-cancelar {
+            background-color: #f44336;
+            color: white;
+        }
+
+        #abrirJanela {
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Calculador de Juros</h2>
+
+    <div class="fields">
+        <div class="field-group">
+            <label>Valor:</label>
+            <input type="number" id="valor">
+        </div>
+
+        <div class="field-group">
+            <label>Data de vencimento:</label>
+            <input type="date" id="data_venc">
+        </div>
+    </div>
+    <br/>
+
+    <button type="button" id="btn-calc">Calcular Juros</button>
+    
+    <div class="overlay" id="overlay">
+        <div class="janela">
+            <h3 id="textoJanela"></h3>
+            <br/>
+            <div>
+                <button class="btn-ok" id="botaoOk">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('btn-calc').addEventListener('click', function (event) {
+            if (document.getElementById('data_venc').value == '' || document.getElementById('data_venc').value == null ||
+                document.getElementById('valor').value == '' || document.getElementById('valor').value == null) {
+                abrirJanela("Preencha ambos os campos e tente novamente.");
+            }else{
+                var data_atual = new Date();
+                var data_venc = new Date(document.getElementById('data_venc').value);
+                var valor = Number(document.getElementById('valor').value);
+
+                if (data_venc >= data_atual) {
+                    abrirJanela("Ainda não chegou a data de vencimento.");
+                }else{
+                    var dias_juros = Math.floor(((data_atual - data_venc) / (1000 * 60 * 60 * 24))-1);
+                    var valor_juros = Number(((valor * 2.5) / 100).toFixed(2));
+                    var juros = dias_juros * valor_juros;
+                    abrirJanela("Valor dos juros: R$ "+(juros.toFixed(2)).replace('.', ',')+".");
+                }
+            }
+        });
+
+        function abrirJanela(texto) {
+            const overlay = document.getElementById('overlay');
+            const botaoOk = document.getElementById('botaoOk');
+            const textoJanela = document.getElementById('textoJanela');
+
+            textoJanela.textContent = texto;
+
+            overlay.style.display = 'flex';
+
+            botaoOk.onclick = () => {
+                overlay.style.display = 'none';
+            };
+        }
+    </script>
+
+</body>
+
+</html>
